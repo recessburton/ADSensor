@@ -20,10 +20,15 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "ADSensor.h"
 
+#define NEW_PRINTF_SEMANTICS
+
 configuration ADSensorAppC {
 }
 implementation {
   components MainC, ADSensorC, new AdcReadClientC(), LedsC;
+  
+	components PrintfC;
+	components SerialStartC;
 
   MainC.Boot <- ADSensorC;
   ADSensorC.VoltageRead -> AdcReadClientC;
@@ -32,10 +37,5 @@ implementation {
 
 	components new TimerMilliC() as  TimerC;
 	ADSensorC.Timer -> TimerC;
-
-	components SerialActiveMessageC;
-	components new SerialAMSenderC(AM_SERIAL_ADC) as SerialCollectSender;
-	ADSensorC.SerialControl -> SerialActiveMessageC;
-	ADSensorC.SerialSend -> SerialCollectSender.AMSend;
 }
 

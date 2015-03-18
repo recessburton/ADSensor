@@ -21,6 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "Msp430Adc12.h"
 #include "ADSensor.h"
+#include "printf.h"
 
 module ADSensorC {
   provides {
@@ -31,14 +32,10 @@ module ADSensorC {
     interface Read<uint16_t> as VoltageRead;
     interface Leds;
 
-		interface AMSend as SerialSend;
-		interface SplitControl as SerialControl;
 		interface Timer<TMilli> as Timer;
   }
 }
 implementation {
-
-	message_t serialMsg;
 	uint16_t count;
 
   const msp430adc12_channel_config_t config = {
@@ -55,21 +52,13 @@ implementation {
 
   event void Boot.booted() 
   {
-    call Leds.led0Off();
-    call Leds.led1Off();
-    call Leds.led2Off();
-
-		call SerialControl.start();
-		call Timer.startPeriodic(512);
-		count = 0;
+	call Leds.led0Off();
+	call Leds.led1Off();
+	call Leds.led2Off();
+	
+	call Timer.startPeriodic(512);
+	count = 0;
   }
-
-	event void SerialControl.startDone(error_t error) {}
-	event void SerialControl.stopDone(error_t error) {}
-	event void SerialSend.sendDone(message_t* msg, error_t error)
-	{
-		call Leds.led1Toggle();
-	}
 
 	event void Timer.fired()
 	{
@@ -80,12 +69,13 @@ implementation {
   event void VoltageRead.readDone( error_t result, uint16_t val )
   {
     if (result == SUCCESS){
-			adc_msg_t* adc = (adc_msg_t*) call SerialSend.getPayload(&serialMsg, sizeof(adc_msg_t));
+			adc_msg_t* adc =(adc_msg_t*) malloc(sizeof(adc_msg_t));
 			adc->voltage = val;
 			adc->counter = count++;
 			
-			//串口消息发送，可以通过java net.tinyos.tools.Listen -comm serial@/dev/ttyUSB0:tmote 来接收
-			call SerialSend.send(0xffff, &serialMsg, sizeof(adc_msg_t));
+			//可以通过java net.tinyos.tools.PrintfClient -comm serial@/dev/ttyUSB0:tmote 来接收消息
+			printf("counter:%u, Voltage:%u\n",adc->counter,adc->voltage);
+			printfflush();
 
 			call Leds.led0Toggle();
 		}
