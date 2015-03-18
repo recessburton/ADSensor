@@ -30,7 +30,7 @@ implementation {
   AdcReadClientC.AdcConfigure -> ADSensorC.VoltageConfigure;
   ADSensorC.Leds -> LedsC;
 
-	components new TimerMilliC() as TimerC;
+	components new TimerMilliC() as  TimerC;
 	ADSensorC.Timer -> TimerC;
 
 	components SerialActiveMessageC;

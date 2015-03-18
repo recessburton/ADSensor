@@ -83,6 +83,8 @@ implementation {
 			adc_msg_t* adc = (adc_msg_t*) call SerialSend.getPayload(&serialMsg, sizeof(adc_msg_t));
 			adc->voltage = val;
 			adc->counter = count++;
+			
+			//串口消息发送，可以通过java net.tinyos.tools.Listen -comm serial@/dev/ttyUSB0:tmote 来接收
 			call SerialSend.send(0xffff, &serialMsg, sizeof(adc_msg_t));
 
 			call Leds.led0Toggle();
