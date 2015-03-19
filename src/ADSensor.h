@@ -7,7 +7,7 @@
 
 typedef nx_struct adc_msg{
 	nx_uint16_t counter;
-	nx_uint16_t voltage;
+	nx_uint16_t humid;
 }adc_msg_t;
 
 #endif

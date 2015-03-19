@@ -31,8 +31,8 @@ implementation {
 	components SerialStartC;
 
   MainC.Boot <- ADSensorC;
-  ADSensorC.VoltageRead -> AdcReadClientC;
-  AdcReadClientC.AdcConfigure -> ADSensorC.VoltageConfigure;
+  ADSensorC.HumidRead -> AdcReadClientC;
+  AdcReadClientC.AdcConfigure -> ADSensorC.HumidConfigure;
   ADSensorC.Leds -> LedsC;
 
 	components new TimerMilliC() as  TimerC;

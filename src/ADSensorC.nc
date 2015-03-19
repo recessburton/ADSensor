@@ -25,11 +25,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 module ADSensorC {
   provides {
-    interface AdcConfigure<const msp430adc12_channel_config_t*> as VoltageConfigure;
+    interface AdcConfigure<const msp430adc12_channel_config_t*> as HumidConfigure;
   }
   uses {
     interface Boot;
-    interface Read<uint16_t> as VoltageRead;
+    interface Read<uint16_t> as HumidRead;
     interface Leds;
 
 		interface Timer<TMilli> as Timer;
@@ -39,8 +39,12 @@ implementation {
 	uint16_t count;
 
   const msp430adc12_channel_config_t config = {
-      inch: INPUT_CHANNEL_A0,
-     // inch: SUPPLY_VOLTAGE_HALF_CHANNEL,
+  	/*详细配置可用的取值见Msp430Adc12.h头文件*/
+      inch: INPUT_CHANNEL_A0,		
+       // inch: SUPPLY_VOLTAGE_HALF_CHANNEL,					
+      /*输入通道。在电压采集的测试中，无论A0，A1，A2，A3等，
+       * 均能得到900左右的电压值。不知为何？这个通道的选择难道并不对应着10pin针脚处的通道么？？
+       */
       sref: REFERENCE_VREFplus_AVss,
       ref2_5v: REFVOLT_LEVEL_2_5,
       adc12ssel: SHT_SOURCE_ACLK,
@@ -62,26 +66,26 @@ implementation {
 
 	event void Timer.fired()
 	{
-    call VoltageRead.read();
+    call HumidRead.read();
 		call Leds.led2Toggle();
 	}
 
-  event void VoltageRead.readDone( error_t result, uint16_t val )
+  event void HumidRead.readDone( error_t result, uint16_t val )
   {
     if (result == SUCCESS){
 			adc_msg_t* adc =(adc_msg_t*) malloc(sizeof(adc_msg_t));
-			adc->voltage = val;
+			adc->humid = val;
 			adc->counter = count++;
 			
 			//可以通过java net.tinyos.tools.PrintfClient -comm serial@/dev/ttyUSB0:tmote 来接收消息
-			printf("counter:%u, Voltage:%u\n",adc->counter,adc->voltage);
+			printf("counter:%u, Humid:%u\n",adc->counter,adc->humid);
 			printfflush();
 
 			call Leds.led0Toggle();
 		}
   }
 
-  async command const msp430adc12_channel_config_t* VoltageConfigure.getConfiguration()
+  async command const msp430adc12_channel_config_t* HumidConfigure.getConfiguration()
   {
     return &config; // must not be changed
   }
