@@ -57,4 +57,4 @@ else
   include $(MAKERULES)
 endif
 
-CFLAGS += -I$(TOSDIR)/lib/printf
+CFLAGS += -I$(TOSDIR)/lib/printfCFLAGS += -I$(TOSDIR)/lib/printfCFLAGS += -I$(TOSDIR)/lib/printf

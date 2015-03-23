@@ -41,10 +41,6 @@ implementation {
   const msp430adc12_channel_config_t config = {
   	/*详细配置可用的取值见Msp430Adc12.h头文件*/
       inch: INPUT_CHANNEL_A0,		
-       // inch: SUPPLY_VOLTAGE_HALF_CHANNEL,					
-      /*输入通道。在电压采集的测试中，无论A0，A1，A2，A3等，
-       * 均能得到900左右的电压值。不知为何？这个通道的选择难道并不对应着10pin针脚处的通道么？？
-       */
       sref: REFERENCE_VREFplus_AVss,
       ref2_5v: REFVOLT_LEVEL_2_5,
       adc12ssel: SHT_SOURCE_ACLK,
@@ -78,6 +74,7 @@ implementation {
 			adc->counter = count++;
 			
 			//可以通过java net.tinyos.tools.PrintfClient -comm serial@/dev/ttyUSB0:tmote 来接收消息
+			//实际电压转换公式：V=v/4096*2.5，实际土壤湿度H=V/2
 			printf("counter:%u, Humid:%u\n",adc->counter,adc->humid);
 			printfflush();
 
